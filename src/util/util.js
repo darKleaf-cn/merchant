@@ -3,7 +3,7 @@ import {
 } from "element-ui";
 
 export const mobileReg = /^1[3456789]\d{9}$/;
-export const pwdReg = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/;
+export const passwordReg = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/;
 export const decimalReg = /^\d+(\.\d{0,2})?$/;
 
 

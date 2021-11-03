@@ -4,7 +4,7 @@ import {
 } from "./../util/http";
 
 // 获取公钥
-export const getPublicKey = () => post("/getPublicKey");
+// export const getPublicKey = () => post("/getPublicKey");
 // 获取登录用户信息
 export const getUserInfo = () => post("/getUserInfo");
 // 获取省份
