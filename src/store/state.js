@@ -1,8 +1,9 @@
 const state = {
   userInfo: {
-    name: "",
-    nickName: "",
-    avatarUrl: ""
+    uesrId:"",
+    username: "",
+    token: "",
+    userImage: ""
   }
 };
 export default state;

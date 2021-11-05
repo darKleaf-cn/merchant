@@ -1,17 +1,15 @@
 import * as types from "./mutations-types";
-import {
-  getUserInfo
-} from "./../api/common";
+import { userInfo } from "./../api/user";
+import { getStore } from "../util/storage";
 
 const actions = {
-  getUserInfoActions({
-    commit
-  }) {
+  getUserInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getUserInfo().then(res => {
-        if (res.errorCode === 200) {
-          commit(types.SET_USERINFO, res.data);
-          resolve();
+      const token = state.userInfo.token || JSON.parse(getStore('userInfo')).token;
+      userInfo({token}).then(res => {
+        if (res.code === 200) {
+          commit(types.SET_USERINFO, res.result);
+          resolve(res);
         } else {
           reject(res);
         }

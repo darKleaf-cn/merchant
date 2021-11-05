@@ -4,7 +4,7 @@ import {
 } from "./../util/http";
 
 // 获取店铺用户信息
-export const getShopUserInfo = params => post("/user/getShopUserInfo", params);
+export const userInfo = params => get("/user/userinfo", params);
 // 获取店铺用户收货地址
 export const getUserDeliveryAddress = params => post("/user/getUserDeliveryAddress", params);
 // 改变店铺用户状态

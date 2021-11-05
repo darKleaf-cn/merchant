@@ -4,11 +4,11 @@ import {
 } from "./../util/http";
 
 // 获取图书列表
-export const getBookList = params => post("/book/getBookList", params);
+export const getBookList = params => post("/book/queryList", params);
 // 删除列表中的图书
 export const deleteBooks = params => post("/book/deleteBooks", params);
 // 获取所有图书分类
-export const getAllClassify = () => post("/book/getAllClassify");
+export const getBookType = () => post("/book/bookType");
 // 删除分类
 export const deleteClassify = params => post("/book/deleteClassify", params);
 // 更新图书

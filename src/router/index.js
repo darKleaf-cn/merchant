@@ -41,74 +41,74 @@ export default new Router({
     hidden: true
   },
   {
-    path: "/index",
+    path: "/",
     component: Home,
     isSingle: true,
     iconCls: "iconfont icon-home",
     children: [{
-      path: "",
+      path: "index",
       component: Index,
       name: "首页"
     }]
   },
   {
-    path: "/index",
+    path: "/",
     component: Home,
     name: "订单管理",
     iconCls: "iconfont icon-emaxcitygerenxinxitubiaoji03",
     children: [{
-      path: "/index/orderList",
+      path: "/orderList",
       component: OrderList,
       name: "订单列表"
     }, {
-      path: "/index/refundOrderRecord",
+      path: "/refundOrderRecord",
       component: RefundOrderRecord,
       name: "退款订单处理记录"
     }, {
-      path: "/index/deliveryCompany",
+      path: "/deliveryCompany",
       component: DeliveryCompany,
       name: "物流公司列表"
     }]
   },
   {
-    path: "/index",
+    path: "/",
     component: Home,
     name: "图书管理",
     iconCls: "iconfont icon-book",
     children: [{
-      path: "/index/bookList",
+      path: "/bookList",
       component: BookList,
       name: "图书列表"
     },
     {
-      path: "/index/bookClassify",
+      path: "/bookClassify",
       component: BookClassify,
       name: "分类管理"
     }
     ]
   },
   {
-    path: "/index",
+    path: "/",
     component: Home,
     name: "用户管理",
     iconCls: "iconfont icon-icon_user_management",
     children: [{
-      path: "/index/userList",
+      path: "/userList",
       component: UserList,
       name: "用户列表"
     }]
   },
   {
-    path: "/index",
+    path: "/",
     component: Home,
     name: "进货管理",
     iconCls: "iconfont icon-jinhuodan",
     children: [{
-      path: "/index/stockPurchase",
+      path: "/stockPurchase",
       component: StockPurchase,
       name: "库存管理"
     }, {
-      path: "/index/stockRecord",
+      path: "/stockRecord",
       component: StockRecord,
       name: "进货记录"
     }]
@@ -119,33 +119,33 @@ export default new Router({
     name: "系统管理",
     iconCls: "iconfont icon-setting",
     children: [{
-      path: "/index/adminInfo",
+      path: "/adminInfo",
       component: AdminInfo,
       name: "个人信息修改"
     }, {
-      path: "/index/shopManagement",
+      path: "/shopManagement",
       component: ShopManagement,
       name: "店铺管理"
     }, {
-      path: "/index/shopOptionRecord",
+      path: "/shopOptionRecord",
       component: ShopOptionRecord,
       name: "店铺操作日志"
     }]
   },
   {
-    path: "/index",
+    path: "/",
     component: Home,
     hidden: true,
     children: [{
-      path: "/index/forbidden",
+      path: "/forbidden",
       component: Forbidden,
       name: "forbidden"
     }, {
-      path: "/index/serverError",
+      path: "/serverError",
       component: ServerError,
       name: "serverError"
     }, {
-      path: "/index/*",
+      path: "*",
       component: NotFound,
       name: "404"
     }]

@@ -19,21 +19,24 @@
         v-model.trim="searchParam.name"
         clearable
         @keyup.native.enter="search"
-      ></el-input>
+      >
+      </el-input>
       <el-input
         placeholder="作者"
         size="medium"
         v-model.trim="searchParam.author"
         clearable
         @keyup.native.enter="search"
-      ></el-input>
+      >
+      </el-input>
       <el-input
         placeholder="出版社"
         size="medium"
         v-model.trim="searchParam.press"
         clearable
         @keyup.native.enter="search"
-      ></el-input>
+      >
+      </el-input>
     </div>
     <div class="option-button">
       <el-button
@@ -73,133 +76,72 @@
       <el-table
         size="mini"
         v-loading="loading"
-        :data="tableData"
+        :data="bookList"
         :header-cell-style="{ background: '#fdfdfd' }"
         :height="460"
         @selection-change="handleSelectionChange"
         border
       >
+        <el-table-column type="selection" align="center"></el-table-column>
+        <!-- <template v-for="item in tableItem"> -->
         <el-table-column
-          type="selection"
+          prop="name"
           align="center"
-          width="40"
+          label="书名"
         ></el-table-column>
-        <!-- <template v-for="item in tableItem">
-          <el-table-column v-if="(item.name === 'name') && item.isShow"
-              key="name"
-              prop="name"
-              align="center"
-              label="书名"
-              width="160"></el-table-column>
-          <el-table-column v-if="(item.name === 'author') && item.isShow"
-              key="author"
-              prop="author"
-              align="center"
-              label="作者"
-              width="140"></el-table-column>
-          <el-table-column v-if="(item.name === 'press') && item.isShow"
-              key="press"
-              prop="press"
-              align="center"
-              label="出版社"
-              width="180"></el-table-column>
-          <el-table-column v-if="(item.name === 'isSell') && item.isShow"
-              key="isSell"
-              align="center"
-              label="是否在售"
-              width="100">
-            <template slot-scope="scope">
-            <span v-if="scope.row.isSell == 1"
-                class="status-success">是</span>
-              <span v-else
-                  class="status-failed">否</span>
-            </template>
-          </el-table-column>
-          <el-table-column v-if="(item.name === 'classify') && item.isShow"
-              key="classify"
-              align="center"
-              label="分类"
-              width="180">
-            <template slot-scope="scope">
-              <show-tags :classify="scope.row.classify"
-                  :classifyMap="classifyMap"></show-tags>
-            </template>
-          </el-table-column>
-          <el-table-column v-if="(item.name === 'title') && item.isShow"
-              key="title"
-              align="center"
-              label="标题"
-              width="180">
-            <template slot-scope="scope">
-              <span :title="scope.row.title">{{scope.row.title ? scope.row.title.length > 8 ? scope.row.title.slice(0,10) + '...' : scope.row.title : scope.row.title}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column v-if="(item.name === 'description') && item.isShow"
-              key="description"
-              align="center"
-              label="描述"
-              width="180">
-            <template slot-scope="scope">
-              <span :title="scope.row.description">{{scope.row.description ? scope.row.description.length > 8 ? scope.row.description.slice(0,10) + '...' : scope.row.description : scope.row.description}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column v-if="(item.name === 'stock') && item.isShow"
-              key="stock"
-              prop="stock"
-              align="center"
-              label="库存"
-              width="100"></el-table-column>
-          <el-table-column v-if="(item.name === 'price') && item.isShow"
-              key="price"
-              align="center"
-              label="价格"
-              width="100">
-            <template slot-scope="scope">
-              <span>{{scope.row.price | money}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column v-if="(item.name === 'salePrice') && item.isShow"
-              key="salePrice"
-              align="center"
-              label="折后价"
-              width="100">
-            <template slot-scope="scope">
-              <span>{{scope.row.salePrice | money}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column v-if="(item.name === 'imageUrl') && item.isShow"
-              key="imageUrl"
-              align="center"
-              label="图片"
-              width="100">
-            <template slot-scope="scope">
-              <el-button v-if="scope.row.imageUrl"
-                  type="text"
-                  size="mini"
-                  @click.native="showImgDialogFun(scope.row.imageUrl)">查看图片
-              </el-button>
-              <span v-else>---</span>
-            </template>
-          </el-table-column>
-          <el-table-column v-if="(item.name === 'createdAt') && item.isShow"
-              key="createdAt"
-              prop="createdAt"
-              align="center"
-              label="创建时间"
-              width="160"></el-table-column>
-          <el-table-column v-if="(item.name === 'updatedAt') && item.isShow"
-              key="updatedAt"
-              prop="updatedAt"
-              align="center"
-              label="修改时间"
-              width="160"></el-table-column>
-        </template> -->
-        <el-table-column fixed="right" align="center" label="操作" width="100">
+        <el-table-column align="center" label="是否在售">
+          <template slot-scope="scope">
+            <span v-if="scope.row.isSell == 1" class="status-success">是</span>
+            <span v-else class="status-failed">否</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="type" align="center" label="类型">
+        </el-table-column>
+        <el-table-column prop="price" align="center" label="价格">
+        </el-table-column>
+        <el-table-column align="center" label="主图">
+          <template slot-scope="scope">
+            <el-button
+              v-if="scope.row.image"
+              type="text"
+              size="mini"
+              @click.native="showImgDialogFun(scope.row.image)"
+              >查看图片
+            </el-button>
+            <span v-else>---</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="描述图集">
+          <template slot-scope="scope">
+            <el-button
+              v-if="scope.row.imageSmall"
+              type="text"
+              size="mini"
+              @click.native="showImgDialogFun(scope.row.imageSmall)"
+              >查看图片
+            </el-button>
+            <span v-else>---</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="详细信息">
+          <template slot-scope="scope">
+            <el-button
+              v-if="scope.row.detail"
+              type="text"
+              size="mini"
+              @click.native="showImgDialogFun(scope.row.detail)"
+              >查看图片
+            </el-button>
+            <span v-else>---</span>
+          </template>
+        </el-table-column>
+        <!-- </template> -->
+        <el-table-column fixed="right" align="center" label="操作">
           <template slot-scope="scope">
             <el-button
               type="text"
               size="mini"
-              @click.native="editBook(scope.row)"
+              @click.native="updateBookFun(scope.row)"
               >编辑
             </el-button>
           </template>
@@ -226,70 +168,47 @@
       @close="closeDialog"
     >
       <el-form
-        ref="editDataForm"
-        :model="editData"
-        :rules="editDataValidate"
+        ref="updateBookForm"
+        :model="updateBook"
+        :rules="updateBookValidate"
         :hide-required-asterisk="false"
       >
         <el-form-item label="书名" prop="name" label-width="80px">
-          <el-input v-model.trim="editData.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="作者" prop="author" label-width="80px">
           <el-input
-            v-model.trim="editData.author"
+            v-model.trim="updateBook.name"
             autocomplete="off"
           ></el-input>
         </el-form-item>
-        <el-form-item label="出版社" prop="press" label-width="80px">
-          <el-input v-model.trim="editData.press" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="分类" label-width="80px">
-          <el-select v-model="editData.classify" multiple placeholder="请选择">
+        <el-form-item label="类型" label-width="80px">
+          <el-select v-model="updateBook.type" multiple placeholder="请选择">
             <el-option
-              v-for="item in classify"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
+              v-for="item in bookType"
+              :key="item"
+              :label="item"
+              :value="item"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="标题" prop="title" label-width="80px">
-          <el-input v-model.trim="editData.title" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="描述" prop="description" label-width="80px">
-          <el-input
-            type="textarea"
-            v-model.trim="editData.description"
-            resize="none"
-            autocomplete="off"
-            :rows="3"
-          ></el-input>
-        </el-form-item>
         <el-form-item label="价格" prop="price" label-width="80px">
           <el-input
-            v-model.trim="editData.price"
-            type="number"
-            step="0.01"
-            autocomplete="off"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="折后价" prop="salePrice" label-width="80px">
-          <el-input
-            v-model.trim="editData.salePrice"
+            v-model.trim="updateBook.price"
             type="number"
             step="0.01"
             autocomplete="off"
           ></el-input>
         </el-form-item>
         <el-form-item label="是否在售" label-width="80px">
-          <el-switch v-model="editData.isSell"></el-switch>
+          <el-switch v-model="updateBook.isSell"></el-switch>
         </el-form-item>
-        <el-form-item label="图片" label-width="80px">
+        <el-form-item label="描述图集" label-width="80px">
+          <ImageList :imageList="updateBook.imageSmall"> </ImageList>
+        </el-form-item>
+        <!-- <el-form-item label="主图" label-width="80px">
           <el-button
-            v-if="editData.imageUrl"
+            v-if="updateBook.image"
             type="text"
             size="small"
-            @click.native="showImgDialogFun(editData.imageUrl)"
+            @click.native="showImgDialogFun(updateBook.image)"
             >查看图片
           </el-button>
           <el-upload
@@ -303,7 +222,7 @@
             :on-change="handleFileChange"
           >
             <el-button slot="trigger" size="small" type="primary"
-              >{{ editData.imageUrl ? "更换" : "上传" }}图片
+              >{{ updateBook.image ? "更换" : "上传" }}图片
             </el-button>
             <div slot="tip" class="el-upload__tip">
               只能上传jpg/png文件，且不超过2M
@@ -316,7 +235,7 @@
               <img :src="previewBase64" title="点击查看大图" />
             </div>
           </el-upload>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="small" @click="showEditFormDialog = false"
@@ -325,14 +244,19 @@
         <el-button
           type="primary"
           size="small"
-          @click="submitEditBook('editDataForm')"
+          @click="submitEditBook('updateBookForm')"
           >确 定
         </el-button>
       </div>
     </el-dialog>
     <el-dialog top="50px" width="700px" :visible.sync="showImgDialog">
       <div class="dialog-img">
-        <img :src="showImageUrl" alt="图片详情" />
+        <img
+          v-for="(item, i) in showImageUrl"
+          :key="i"
+          :src="item"
+          alt="图片详情"
+        />
       </div>
     </el-dialog>
     <el-dialog
@@ -393,6 +317,7 @@ import {
   handleError,
   decimalReg,
 } from "./../../util/util";
+import ImageList from "../image/index.vue";
 
 // import showTags from "./../../components/ShowTags";
 import { SlickList, SlickItem, HandleDirective } from "vue-slicksort";
@@ -407,9 +332,9 @@ export default {
       // 时间选择框
       dataPicker: [],
       // 列表数据
-      tableData: [],
+      bookList: [],
       // 编辑数据
-      editData: {},
+      updateBook: {},
       // 编辑表格弹窗
       editTableDialog: false,
       // 临时编辑表格数据
@@ -417,19 +342,55 @@ export default {
       // 编辑表格要显示的
       selectEditTable: [],
       // 提交校验规则
-      editDataValidate: {
-        name: [{ required: true, message: "请输入书名", trigger: "blur" }],
-        author: [{ required: true, message: "请输入作者", trigger: "blur" }],
-        press: [{ required: true, message: "请输入出版社", trigger: "blur" }],
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
+      updateBookValidate: {
+        name: [
+          {
+            required: true,
+            message: "请输入书名",
+            trigger: "blur",
+          },
+        ],
+        author: [
+          {
+            required: true,
+            message: "请输入作者",
+            trigger: "blur",
+          },
+        ],
+        press: [
+          {
+            required: true,
+            message: "请输入出版社",
+            trigger: "blur",
+          },
+        ],
+        title: [
+          {
+            required: true,
+            message: "请输入标题",
+            trigger: "blur",
+          },
+        ],
         description: [
-          { required: true, message: "请输入描述", trigger: "blur" },
+          {
+            required: true,
+            message: "请输入描述",
+            trigger: "blur",
+          },
         ],
         price: [
-          { required: true, validator: this.decimalRegFun, trigger: "blur" },
+          {
+            required: true,
+            validator: this.decimalRegFun,
+            trigger: "blur",
+          },
         ],
         salePrice: [
-          { required: true, validator: this.decimalRegFun, trigger: "blur" },
+          {
+            required: true,
+            validator: this.decimalRegFun,
+            trigger: "blur",
+          },
         ],
       },
       // 加载中
@@ -439,7 +400,7 @@ export default {
       // 选择的值
       multipleSelection: [],
       // 分类
-      classify: [],
+      bookType: [],
       // 图片预览base64
       previewBase64: "",
       // file文件
@@ -447,7 +408,7 @@ export default {
       // 展示查看大图
       showImgDialog: false,
       // 大图Url
-      showImageUrl: "",
+      showImageUrl: [],
       // 搜索参数
       searchParam: {
         pageNumber: 1,
@@ -480,7 +441,7 @@ export default {
           isShow: true,
         },
         {
-          name: "classify",
+          name: "bookType",
           title: "分类",
           isShow: true,
         },
@@ -529,10 +490,10 @@ export default {
   },
   computed: {
     // 分类转换为 map
-    classifyMap() {
+    bookTypeMap() {
       let obj = {};
-      for (let i = 0, len = this.classify.length; i < len; i++) {
-        obj[this.classify[i].id] = this.classify[i].name;
+      for (let i = 0, len = this.bookType.length; i < len; i++) {
+        obj[this.bookType[i].id] = this.bookType[i].name;
       }
       return obj;
     },
@@ -541,7 +502,7 @@ export default {
     // 默认查一个月的
     this.dataPicker = getDatePickerTime(90);
     this.getBookList();
-    this.getAllClassifyFun();
+    this.getBookType();
     let tableItemStorage = localStorage.getItem(STORAGE_NAME);
     if (tableItemStorage) {
       this.tableItem = JSON.parse(tableItemStorage);
@@ -562,12 +523,12 @@ export default {
         this.loading = true;
         let res = await bookApi.getBookList(this.searchParam);
         this.loading = false;
-        if (res.errorCode === 200) {
-          this.tableData = res.data.rows;
-          this.total = res.data.total;
+        if (res.code === 200) {
+          this.bookList = res.result.data;
+          this.total = res.result.total;
         } else {
           this.$message({
-            message: res.errorMsg,
+            message: res.message,
             type: "error",
           });
         }
@@ -577,16 +538,16 @@ export default {
       }
     },
     // 获取全部分类
-    async getAllClassifyFun() {
+    async getBookType() {
       try {
         this.loading = true;
-        let res = await bookApi.getAllClassify();
+        let res = await bookApi.getBookType();
         this.loading = false;
-        if (res.errorCode === 200) {
-          this.classify = res.data;
+        if (res.code === 200) {
+          this.bookType = res.result.data;
         } else {
           this.$message({
-            message: res.errorMsg,
+            message: res.message,
             type: "error",
           });
         }
@@ -648,17 +609,8 @@ export default {
       this.getBookList();
     },
     // 编辑图书
-    editBook(row) {
-      this.editData = Object.assign({}, row);
-      this.previewBase64 = "";
-      if (row.classify) {
-        this.editData.classify = row.classify
-          .split(",")
-          .map((item) => parseInt(item));
-      } else {
-        this.editData.classify = [];
-      }
-      this.editData.isSell = row.isSell === 1;
+    updateBookFun(row) {
+      this.updateBook = Object.assign({}, row);
       this.showEditFormDialog = true;
     },
     // 提交更改
@@ -666,13 +618,13 @@ export default {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
           let formData = new FormData();
-          for (let key in this.editData) {
+          for (let key in this.updateBook) {
             switch (key) {
-              case "classify":
-                formData.append(key, this.editData[key].join(","));
+              case "bookType":
+                formData.append(key, this.updateBook[key].join(","));
                 break;
               case "isSell":
-                formData.append(key, this.editData[key] ? 1 : 0);
+                formData.append(key, this.updateBook[key] ? 1 : 0);
                 break;
               case "imageUrl":
                 formData.append(key, this.uploadFile);
@@ -683,15 +635,17 @@ export default {
               case "stockPrice":
                 break;
               default:
-                formData.append(key, this.editData[key]);
+                formData.append(key, this.updateBook[key]);
             }
           }
           let config = {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           };
           try {
             let res = await bookApi.updateBook(formData, config);
-            if (res.errorCode === 200) {
+            if (res.code === 200) {
               this.$message({
                 message: "提交成功",
                 type: "success",
@@ -700,7 +654,7 @@ export default {
               this.getBookList();
             } else {
               this.$message({
-                message: res.errorMsg,
+                message: res.message,
                 type: "error",
               });
             }
@@ -724,7 +678,7 @@ export default {
       }
       try {
         let res = await bookApi.changeBookSellStatus(obj);
-        if (res.errorCode === 200) {
+        if (res.code === 200) {
           this.$message({
             message: "更改成功",
             type: "success",
@@ -732,7 +686,7 @@ export default {
           this.getBookList();
         } else {
           this.$message({
-            message: res.errorMsg,
+            message: res.message,
             type: "error",
           });
         }
@@ -765,10 +719,15 @@ export default {
     },
     // 查看大图
     showImgDialogFun(imageUrl, isBase64) {
-      if (isBase64) {
+      // if (isBase64) {
+      //   this.showImageUrl = imageUrl;
+      // } else {
+      //   this.showImageUrl = imageUrl + this.getTimeUrl();
+      // }
+      if (Array.isArray(imageUrl)) {
         this.showImageUrl = imageUrl;
       } else {
-        this.showImageUrl = imageUrl + this.getTimeUrl();
+        this.showImageUrl = [imageUrl];
       }
       this.showImgDialog = true;
     },
@@ -788,7 +747,7 @@ export default {
     },
     // 关闭弹框
     closeDialog() {
-      this.$refs["editDataForm"].clearValidate();
+      this.$refs["updateBookForm"].clearValidate();
     },
     // url加上时间参数
     getTimeUrl() {
@@ -807,94 +766,66 @@ export default {
     // showTags,
     SlickItem,
     SlickList,
+    ImageList,
   },
-  directives: { handle: HandleDirective },
+  directives: {
+    handle: HandleDirective,
+  },
 };
 </script>
 
 <style lang="stylus" scoped>
-@import './../../styl/variables.styl';
-@import './../../styl/common.styl';
-
-.filter-search {
-  display: flex;
-  flex-wrap: wrap;
-
-  .el-date-editor {
-    max-width: 360px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-  }
-
-  .el-input {
-    max-width: 140px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-  }
-}
-
-.option-button {
-  position: relative;
-  padding-right: 50px;
-
-  .edit-btn {
-    position: absolute;
-    right: 4px;
-  }
-}
-
-.form-upload-excel {
-  display: inline-block;
-  margin-left: 10px;
-}
-
-.table-container {
-  margin-top: 20px;
-
-  .el-pagination {
-    margin-top: 20px;
-  }
-}
-
-.el-dialog__body {
-  .el-form {
-    height: 400px;
-    padding: 10px;
-    overflow-y: scroll;
-
-    .el-select {
-      width: 100%;
-    }
-  }
-
-  .el-input-number {
-    margin-left: 10px;
-  }
-
-  .preview {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    margin-top: 6px;
-    border: 1px dashed #999;
-    border-radius: 6px;
-
-    img {
-      cursor: pointer;
-      max-width: 300px;
-    }
-  }
-}
-
-.dialog-img {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-
-  img {
-    max-width: 600px;
-  }
-}
+@import './../../styl/variables.styl'
+@import './../../styl/common.styl'
+.filter-search
+  display flex
+  flex-wrap wrap
+  .el-date-editor
+    max-width 360px
+    margin-right 10px
+    margin-bottom 10px
+  .el-input
+    max-width 140px
+    margin-right 10px
+    margin-bottom 10px
+.option-button
+  position relative
+  padding-right 50px
+  .edit-btn
+    position absolute
+    right 4px
+.form-upload-excel
+  display inline-block
+  margin-left 10px
+.table-container
+  margin-top 20px
+  .el-pagination
+    margin-top 20px
+.el-dialog__body
+  .el-form
+    height 400px
+    padding 10px
+    overflow-y scroll
+    .el-select
+      width 100%
+  .el-input-number
+    margin-left 10px
+  .preview
+    display flex
+    justify-content center
+    align-items center
+    padding 10px
+    margin-top 6px
+    border 1px dashed #999
+    border-radius 6px
+    img
+      cursor pointer
+      max-width 300px
+.dialog-img
+  display flex
+  justify-content center
+  align-items center
+  padding 10px
+  img
+    max-width 600px
 </style>
