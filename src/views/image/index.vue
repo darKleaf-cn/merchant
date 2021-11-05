@@ -1,46 +1,67 @@
 <template>
-  <div class="imageList">
-    <div class="imageList-item" v-for="(item, i) in imageList" :key="i" style="width: 200px; height: 200px">
-      <el-image
-        style="width: 150px; height: 150px"
-        :src="item"
-        fit="contain"
-      ></el-image>
-      <div class="imageList-button">
-        <el-button type="primary" plain>修改</el-button>
-        <el-button type="danger" plain>删除</el-button>
-      </div>
-    </div>
+  <div>
+    <el-upload
+      action="https://jsonplaceholder.typicode.com/posts/"
+      list-type="picture-card"
+      :on-preview="handlePictureCardPreview"
+      :on-remove="handleRemove"
+      file-list="image"
+    >
+      <i class="el-icon-plus"></i>
+    </el-upload>
+    <el-dialog :visible.sync="dialogVisible">
+      <img width="100%" :src="dialogImageUrl" alt="" />
+    </el-dialog>
   </div>
 </template>
 
 <script>
 export default {
   props: {
-    imageList: [],
+    image: [String, Array],
   },
   data() {
-    return {};
+    return {
+      dialogImageUrl:'',
+      dialogVisible: false
+    };
   },
   methods: {},
 };
 </script>
 
 <style lang="stylus" scoped>
-.imageList
-	display flex
+.imageList {
+  display: flex;
+  flex-wrap: wrap;
 
-.imageList-item
-	display flex
-	
-	.el-image
-		display flex
-	.imageList-button
-		display none
-	&:hover
-		.el-image
-			display none
-		.imageList-button
-			display flex
-			align-items center
+  .imageList-item {
+    display: flex;
+    align-items: center;
+    width: 150px;
+    height: 150px;
+    margin: 2px;
+
+    .el-image {
+      display: flex;
+      width: 150px;
+      height: 150px;
+    }
+
+    .imageList-button {
+      display: none;
+    }
+
+    &:hover {
+      .el-image {
+        display: none;
+      }
+
+      .imageList-button {
+        display: flex;
+        justify-content: center;
+      }
+    }
+  }
+}
 </style>

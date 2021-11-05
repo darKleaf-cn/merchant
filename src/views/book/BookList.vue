@@ -52,24 +52,14 @@
       <el-button
         type="success"
         size="medium"
-        @click.native="changeBookSellStatus(1)"
+        @click.native="changeBookSaleStatus(1)"
         >上架
       </el-button>
       <el-button
         type="danger"
         size="medium"
-        @click.native="changeBookSellStatus(0)"
+        @click.native="changeBookSaleStatus(0)"
         >下架
-      </el-button>
-      <el-button
-        type="primary"
-        class="edit-btn"
-        title="编辑表格"
-        size="medium"
-        icon="el-icon-edit-outline"
-        circle
-        @click.native="editTable"
-      >
       </el-button>
     </div>
     <div class="table-container">
@@ -91,7 +81,7 @@
         ></el-table-column>
         <el-table-column align="center" label="是否在售">
           <template slot-scope="scope">
-            <span v-if="scope.row.isSell == 1" class="status-success">是</span>
+            <span v-if="scope.row.isSale === true" class="status-success">是</span>
             <span v-else class="status-failed">否</span>
           </template>
         </el-table-column>
@@ -180,7 +170,7 @@
           ></el-input>
         </el-form-item>
         <el-form-item label="类型" label-width="80px">
-          <el-select v-model="updateBook.type" multiple placeholder="请选择">
+          <el-select v-model="updateBook.type" placeholder="请选择">
             <el-option
               v-for="item in bookType"
               :key="item"
@@ -193,15 +183,21 @@
           <el-input
             v-model.trim="updateBook.price"
             type="number"
-            step="0.01"
+            step="1"
             autocomplete="off"
           ></el-input>
         </el-form-item>
         <el-form-item label="是否在售" label-width="80px">
-          <el-switch v-model="updateBook.isSell"></el-switch>
+          <el-switch v-model="updateBook.isSale"></el-switch>
+        </el-form-item>
+        <el-form-item label="主图" label-width="80px">
+          <ImageList :image="updateBook.image"> </ImageList>
         </el-form-item>
         <el-form-item label="描述图集" label-width="80px">
-          <ImageList :imageList="updateBook.imageSmall"> </ImageList>
+          <ImageList :image="updateBook.imageSmall"> </ImageList>
+        </el-form-item>
+        <el-form-item label="详细信息" label-width="80px">
+          <ImageList :image="updateBook.detail"> </ImageList>
         </el-form-item>
         <!-- <el-form-item label="主图" label-width="80px">
           <el-button
@@ -249,62 +245,16 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog top="50px" width="700px" :visible.sync="showImgDialog">
+    <el-dialog top="50px" :visible.sync="showImgDialog">
       <div class="dialog-img">
         <img
           v-for="(item, i) in showImageUrl"
           :key="i"
           :src="item"
           alt="图片详情"
+          style="margin:10px"
         />
       </div>
-    </el-dialog>
-    <el-dialog
-      title="编辑表格"
-      top="60px"
-      width="300px"
-      :visible.sync="editTableDialog"
-    >
-      <div class="edit-table-dialog">
-        <div class="tips">
-          <span> <i class="el-icon-info"></i> 拖拽可排序 </span>
-          <el-button type="text" size="mini" @click="resetEditTable">
-            恢复默认
-          </el-button>
-        </div>
-        <SlickList
-          lockAxis="y"
-          class="slick-list"
-          helperClass="slick-helper"
-          :useDragHandle="true"
-          v-model="editTableItem"
-        >
-          <SlickItem
-            v-for="(item, index) in editTableItem"
-            class="slick-item"
-            :index="index"
-            :showHandle="true"
-            :key="item.name"
-          >
-            <span v-handle class="handle"></span>
-            <el-checkbox
-              v-model="selectEditTable"
-              :label="item.name"
-              :disabled="item.name === 'name'"
-            >
-              {{ index + 1 + " - " + item.title }}
-            </el-checkbox>
-          </SlickItem>
-        </SlickList>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button size="small" @click="editTableDialog = false"
-          >取 消</el-button
-        >
-        <el-button size="small" type="primary" @click="submitEditTable"
-          >确 定</el-button
-        >
-      </span>
     </el-dialog>
   </div>
 </template>
@@ -320,7 +270,7 @@ import {
 import ImageList from "../image/index.vue";
 
 // import showTags from "./../../components/ShowTags";
-import { SlickList, SlickItem, HandleDirective } from "vue-slicksort";
+import {HandleDirective } from "vue-slicksort";
 
 const STORAGE_NAME = "bookListTable";
 
@@ -436,7 +386,7 @@ export default {
           isShow: true,
         },
         {
-          name: "isSell",
+          name: "isSale",
           title: "是否在售",
           isShow: true,
         },
@@ -623,7 +573,7 @@ export default {
               case "bookType":
                 formData.append(key, this.updateBook[key].join(","));
                 break;
-              case "isSell":
+              case "isSale":
                 formData.append(key, this.updateBook[key] ? 1 : 0);
                 break;
               case "imageUrl":
@@ -664,10 +614,10 @@ export default {
         }
       });
     },
-    async changeBookSellStatus(isSell) {
+    async changeBookSaleStatus(isSale) {
       let params = this.multipleSelection.map((val) => val.id);
       let obj = {};
-      obj.isSell = isSell;
+      obj.isSale = isSale;
       obj.ids = params.join(",");
       if (params.length === 0) {
         this.$message({
@@ -677,7 +627,7 @@ export default {
         return false;
       }
       try {
-        let res = await bookApi.changeBookSellStatus(obj);
+        let res = await bookApi.changeBookSaleStatus(obj);
         if (res.code === 200) {
           this.$message({
             message: "更改成功",
@@ -763,9 +713,6 @@ export default {
     },
   },
   components: {
-    // showTags,
-    SlickItem,
-    SlickList,
     ImageList,
   },
   directives: {
@@ -825,7 +772,8 @@ export default {
   display flex
   justify-content center
   align-items center
+  flex-wrap wrap
   padding 10px
   img
-    max-width 600px
+    max-width 200px
 </style>

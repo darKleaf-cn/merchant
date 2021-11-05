@@ -152,6 +152,7 @@ export default {
     height: 60px;
     background: $color-primary;
     color: #fff;
+    justify-content: space-between;
 
     .sound-tips {
       flex: 1;
