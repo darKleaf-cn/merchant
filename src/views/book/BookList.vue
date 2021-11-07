@@ -151,7 +151,7 @@
     <el-dialog
       title="编辑图书"
       top="50px"
-      width="500px"
+      width="1000px"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :visible.sync="showEditFormDialog"
@@ -191,13 +191,13 @@
           <el-switch v-model="updateBook.isSale"></el-switch>
         </el-form-item>
         <el-form-item label="主图" label-width="80px">
-          <ImageList :image="updateBook.image"> </ImageList>
+          <ImageList :image="updateBook.image" :limit="1"> </ImageList>
         </el-form-item>
         <el-form-item label="描述图集" label-width="80px">
-          <ImageList :image="updateBook.imageSmall"> </ImageList>
+          <ImageList :image="updateBook.imageSmall" :limit="4"> </ImageList>
         </el-form-item>
         <el-form-item label="详细信息" label-width="80px">
-          <ImageList :image="updateBook.detail"> </ImageList>
+          <ImageList :image="updateBook.detail" :limit="1"> </ImageList>
         </el-form-item>
         <!-- <el-form-item label="主图" label-width="80px">
           <el-button
