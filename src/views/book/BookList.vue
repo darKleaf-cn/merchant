@@ -1,18 +1,6 @@
 <template>
   <div>
     <div class="filter-search">
-      <el-date-picker
-        v-model="dataPicker"
-        size="medium"
-        type="datetimerange"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        format="yyyy-MM-dd HH:mm:ss"
-        value-format="yyyy-MM-dd HH:mm:ss"
-        :editable="false"
-        :clearable="false"
-        :default-time="['00:00:00', '23:59:59']"
-      ></el-date-picker>
       <el-input
         placeholder="书名"
         size="medium"
@@ -22,17 +10,9 @@
       >
       </el-input>
       <el-input
-        placeholder="作者"
+        placeholder="类型"
         size="medium"
-        v-model.trim="searchParam.author"
-        clearable
-        @keyup.native.enter="search"
-      >
-      </el-input>
-      <el-input
-        placeholder="出版社"
-        size="medium"
-        v-model.trim="searchParam.press"
+        v-model.trim="searchParam.type"
         clearable
         @keyup.native.enter="search"
       >
@@ -49,16 +29,19 @@
       <el-button type="danger" size="medium" @click.native="resetSearch"
         >重置
       </el-button>
+      <el-button type="danger" size="medium" @click.native="deleteBook"
+        >删除
+      </el-button>
       <el-button
         type="success"
         size="medium"
-        @click.native="changeBookSaleStatus(1)"
+        @click.native="changeBookSaleStatus(true)"
         >上架
       </el-button>
       <el-button
         type="danger"
         size="medium"
-        @click.native="changeBookSaleStatus(0)"
+        @click.native="changeBookSaleStatus(false)"
         >下架
       </el-button>
     </div>
@@ -81,11 +64,15 @@
         ></el-table-column>
         <el-table-column align="center" label="是否在售">
           <template slot-scope="scope">
-            <span v-if="scope.row.isSale === true" class="status-success">是</span>
+            <span v-if="scope.row.isSale === true" class="status-success"
+              >是</span
+            >
             <span v-else class="status-failed">否</span>
           </template>
         </el-table-column>
         <el-table-column prop="type" align="center" label="类型">
+        </el-table-column>
+        <el-table-column prop="describe" align="center" label="描述信息">
         </el-table-column>
         <el-table-column prop="price" align="center" label="价格">
         </el-table-column>
@@ -96,7 +83,8 @@
               type="text"
               size="mini"
               @click.native="showImgDialogFun(scope.row.image)"
-              >查看图片
+            >
+              查看图片
             </el-button>
             <span v-else>---</span>
           </template>
@@ -141,9 +129,9 @@
         background
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="searchParam.pageNumber"
+        :current-page="searchParam.page"
         :page-sizes="[15, 30, 50]"
-        :page-size="searchParam.pageSize"
+        :page-size="searchParam.size"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total"
       ></el-pagination>
@@ -178,6 +166,12 @@
               :value="item"
             ></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="描述信息" prop="describe" label-width="80px">
+          <el-input
+            v-model.trim="updateBook.describe"
+            autocomplete="off"
+          ></el-input>
         </el-form-item>
         <el-form-item label="价格" prop="price" label-width="80px">
           <el-input
@@ -252,7 +246,7 @@
           :key="i"
           :src="item"
           alt="图片详情"
-          style="margin:10px"
+          style="margin: 10px"
         />
       </div>
     </el-dialog>
@@ -268,15 +262,17 @@ import {
   decimalReg,
 } from "./../../util/util";
 import ImageList from "../image/index.vue";
+import { mapState } from "vuex";
 
 // import showTags from "./../../components/ShowTags";
-import {HandleDirective } from "vue-slicksort";
+import { HandleDirective } from "vue-slicksort";
 
 const STORAGE_NAME = "bookListTable";
 
 export default {
   data() {
     return {
+      userId: "",
       // 列表数据总数
       total: 0,
       // 时间选择框
@@ -300,45 +296,10 @@ export default {
             trigger: "blur",
           },
         ],
-        author: [
+        describe: [
           {
             required: true,
-            message: "请输入作者",
-            trigger: "blur",
-          },
-        ],
-        press: [
-          {
-            required: true,
-            message: "请输入出版社",
-            trigger: "blur",
-          },
-        ],
-        title: [
-          {
-            required: true,
-            message: "请输入标题",
-            trigger: "blur",
-          },
-        ],
-        description: [
-          {
-            required: true,
-            message: "请输入描述",
-            trigger: "blur",
-          },
-        ],
-        price: [
-          {
-            required: true,
-            validator: this.decimalRegFun,
-            trigger: "blur",
-          },
-        ],
-        salePrice: [
-          {
-            required: true,
-            validator: this.decimalRegFun,
+            message: "请输入描述信息",
             trigger: "blur",
           },
         ],
@@ -361,13 +322,10 @@ export default {
       showImageUrl: [],
       // 搜索参数
       searchParam: {
-        pageNumber: 1,
-        pageSize: 15,
-        startTime: "",
-        endTime: "",
+        page: 1,
+        size: 15,
         name: "",
-        author: "",
-        press: "",
+        type: "",
       },
       tableItem: [
         {
@@ -439,6 +397,7 @@ export default {
     };
   },
   computed: {
+    ...mapState["userInfo"],
     // 分类转换为 map
     bookTypeMap() {
       let obj = {};
@@ -462,16 +421,18 @@ export default {
   methods: {
     // 执行搜索
     search() {
-      this.searchParam.pageNumber = 1;
+      this.searchParam.page = 1;
       this.getBookList();
     },
     // 获取表格数据
     async getBookList() {
-      this.searchParam.startTime = this.dataPicker[0];
-      this.searchParam.endTime = this.dataPicker[1];
       try {
         this.loading = true;
-        let res = await bookApi.getBookList(this.searchParam);
+        const param = {
+          ...this.searchParam,
+          useId: this.userId,
+        };
+        let res = await bookApi.getBookList(param);
         this.loading = false;
         if (res.code === 200) {
           this.bookList = res.result.data;
@@ -491,7 +452,10 @@ export default {
     async getBookType() {
       try {
         this.loading = true;
-        let res = await bookApi.getBookType();
+        const param = {
+          userId: this.userId,
+        };
+        let res = await bookApi.getBookType(param);
         this.loading = false;
         if (res.code === 200) {
           this.bookType = res.result.data;
@@ -548,13 +512,10 @@ export default {
     resetSearch() {
       this.dataPicker = getDatePickerTime(90);
       this.searchParam = {
-        pageNumber: 1,
-        pageSize: 15,
-        startTime: "",
-        endTime: "",
+        page: 1,
+        size: 15,
         name: "",
-        author: "",
-        press: "",
+        type: "",
       };
       this.getBookList();
     },
@@ -614,12 +575,13 @@ export default {
         }
       });
     },
+    //上下架
     async changeBookSaleStatus(isSale) {
-      let params = this.multipleSelection.map((val) => val.id);
-      let obj = {};
-      obj.isSale = isSale;
-      obj.ids = params.join(",");
-      if (params.length === 0) {
+      let params = {
+        userId: this.userId,
+        booksId: this.multipleSelection.map((val) => val.bookId),
+      };
+      if (params.booksId.length === 0) {
         this.$message({
           message: "请选择要更改的图书",
           type: "warning",
@@ -627,10 +589,57 @@ export default {
         return false;
       }
       try {
-        let res = await bookApi.changeBookSaleStatus(obj);
+        if (isSale) {
+          let res = await bookApi.onShelf(params);
+          if (res.code === 200) {
+            this.$message({
+              message: "上架成功",
+              type: "success",
+            });
+            this.getBookList();
+          } else {
+            this.$message({
+              message: res.message,
+              type: "error",
+            });
+          }
+        } else {
+          let res = await bookApi.offShelf(params);
+          if (res.code === 200) {
+            this.$message({
+              message: "下架成功",
+              type: "success",
+            });
+            this.getBookList();
+          } else {
+            this.$message({
+              message: res.message,
+              type: "error",
+            });
+          }
+        }
+      } catch (error) {
+        handleError(error);
+      }
+    },
+    //删除书籍
+    async deleteBook() {
+      let params = {
+        userId: this.userId,
+        booksId: this.multipleSelection.map((val) => val.bookId),
+      };
+      if (params.booksId.length === 0) {
+        this.$message({
+          message: "请选择要删除的图书",
+          type: "warning",
+        });
+        return false;
+      }
+      try {
+        let res = await bookApi.delBook(params);
         if (res.code === 200) {
           this.$message({
-            message: "更改成功",
+            message: "删除成功",
             type: "success",
           });
           this.getBookList();
@@ -667,13 +676,8 @@ export default {
         this.uploadFile = file.raw;
       };
     },
-    // 查看大图
-    showImgDialogFun(imageUrl, isBase64) {
-      // if (isBase64) {
-      //   this.showImageUrl = imageUrl;
-      // } else {
-      //   this.showImageUrl = imageUrl + this.getTimeUrl();
-      // }
+    // 查看图片
+    showImgDialogFun(imageUrl) {
       if (Array.isArray(imageUrl)) {
         this.showImageUrl = imageUrl;
       } else {
@@ -687,12 +691,12 @@ export default {
     },
     // 每页页数变化
     handleSizeChange(val) {
-      this.searchParam.pageSize = val;
+      this.searchParam.size = val;
       this.getBookList();
     },
     // 页码变化
     handleCurrentChange(val) {
-      this.searchParam.pageNumber = val;
+      this.searchParam.page = val;
       this.getBookList();
     },
     // 关闭弹框
@@ -722,58 +726,89 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-@import './../../styl/variables.styl'
-@import './../../styl/common.styl'
-.filter-search
-  display flex
-  flex-wrap wrap
-  .el-date-editor
-    max-width 360px
-    margin-right 10px
-    margin-bottom 10px
-  .el-input
-    max-width 140px
-    margin-right 10px
-    margin-bottom 10px
-.option-button
-  position relative
-  padding-right 50px
-  .edit-btn
-    position absolute
-    right 4px
-.form-upload-excel
-  display inline-block
-  margin-left 10px
-.table-container
-  margin-top 20px
-  .el-pagination
-    margin-top 20px
-.el-dialog__body
-  .el-form
-    height 400px
-    padding 10px
-    overflow-y scroll
-    .el-select
-      width 100%
-  .el-input-number
-    margin-left 10px
-  .preview
-    display flex
-    justify-content center
-    align-items center
-    padding 10px
-    margin-top 6px
-    border 1px dashed #999
-    border-radius 6px
-    img
-      cursor pointer
-      max-width 300px
-.dialog-img
-  display flex
-  justify-content center
-  align-items center
-  flex-wrap wrap
-  padding 10px
-  img
-    max-width 200px
+@import './../../styl/variables.styl';
+@import './../../styl/common.styl';
+
+.filter-search {
+  display: flex;
+  flex-wrap: wrap;
+
+  .el-date-editor {
+    max-width: 360px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+
+  .el-input {
+    max-width: 140px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+}
+
+.option-button {
+  position: relative;
+  padding-right: 50px;
+
+  .edit-btn {
+    position: absolute;
+    right: 4px;
+  }
+}
+
+.form-upload-excel {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.table-container {
+  margin-top: 20px;
+
+  .el-pagination {
+    margin-top: 20px;
+  }
+}
+
+.el-dialog__body {
+  .el-form {
+    height: 400px;
+    padding: 10px;
+    overflow-y: scroll;
+
+    .el-select {
+      width: 100%;
+    }
+  }
+
+  .el-input-number {
+    margin-left: 10px;
+  }
+
+  .preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    margin-top: 6px;
+    border: 1px dashed #999;
+    border-radius: 6px;
+
+    img {
+      cursor: pointer;
+      max-width: 300px;
+    }
+  }
+}
+
+.dialog-img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 10px;
+
+  img {
+    max-width: 200px;
+  }
+}
 </style>
