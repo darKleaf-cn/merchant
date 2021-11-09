@@ -1,16 +1,15 @@
 <template>
   <div>
     <el-upload
-      action="sdsdasd"
+    action=''
+      :http-request='a'
       list-type="picture-card"
       :on-preview="handlePictureCardPreview"
       :on-remove="handleRemove"
       :on-change="handleEditChange"
       :before-upload="beforeAvatarUpload"
       :file-list="fileList"
-      :auto-upload="false"
-      :http-request="a"
-      :limit="limit"
+      :class="{ hide: hideUploadEdit }"
     >
       <i class="el-icon-plus"></i>
     </el-upload>
@@ -28,13 +27,14 @@ export default {
   },
   data() {
     return {
+      fileList:[],
       dialogImageUrl: "",
       dialogVisible: false,
       hideUploadEdit: false,
     };
   },
-  computed: {
-    fileList() {
+  methods: {
+    init(){
       const a = [];
       if (Array.isArray(this.image)) {
         for (let item of this.image) {
@@ -47,35 +47,48 @@ export default {
           url: this.image,
         });
       }
-      return a;
+      this.fileList = a;
     },
-  },
-  methods: {
+    a(){
+
+    },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);
-    },
-    a() {
-      console.log(1);
+      this.fileList = fileList;
+      if (this.fileList.length >= this.limit) {
+        this.hideUploadEdit = true;
+      } else {
+        this.hideUploadEdit = false;
+      }
     },
     beforeAvatarUpload(file) {
       console.log(file);
     },
     handleEditChange(file, fileList) {
-      let vm = this;
-      vm.hideUploadEdit = fileList.length >= limit;
+      if (fileList.length >= this.limit) {
+        this.hideUploadEdit = true;
+      } else {
+        this.hideUploadEdit = false;
+      }
     },
+  },
+  created() {
+    this.init();
+    if (this.fileList.length >= this.limit) {
+      this.hideUploadEdit = true;
+    } else {
+      this.hideUploadEdit = false;
+    }
   },
 };
 </script>
 
-<style lang="stylus" scoped>
-.disabled {
-  .el-upload--picture-card{
-    display: none
-  }
+<style>
+.hide .el-upload--picture-card {
+  display: none;
 }
 </style>
