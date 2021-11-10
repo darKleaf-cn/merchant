@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-upload
-    action=''
-      :http-request='a'
+      action="#"
+      :http-request="a"
       list-type="picture-card"
       :on-preview="handlePictureCardPreview"
       :on-remove="handleRemove"
@@ -27,14 +27,14 @@ export default {
   },
   data() {
     return {
-      fileList:[],
+      fileList: [],
       dialogImageUrl: "",
       dialogVisible: false,
       hideUploadEdit: false,
     };
   },
   methods: {
-    init(){
+    init() {
       const a = [];
       if (Array.isArray(this.image)) {
         for (let item of this.image) {
@@ -49,14 +49,15 @@ export default {
       }
       this.fileList = a;
     },
-    a(){
-
+    a() {
+      console.log(this.fileList);
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
     handleRemove(file, fileList) {
+      console.log(this.fileList);
       console.log(file, fileList);
       this.fileList = fileList;
       if (this.fileList.length >= this.limit) {
@@ -66,6 +67,12 @@ export default {
       }
     },
     beforeAvatarUpload(file) {
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function () {
+        console.log(reader.result); //获取到base64格式图片
+      };
+      console.log(this.fileList);
       console.log(file);
     },
     handleEditChange(file, fileList) {

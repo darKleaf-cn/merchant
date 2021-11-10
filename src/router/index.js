@@ -37,19 +37,8 @@ export default new Router({
   },
   {
     path: "/",
-    redirect: "index",
+    redirect: "bookList",
     hidden: true
-  },
-  {
-    path: "/",
-    component: Home,
-    isSingle: true,
-    iconCls: "iconfont icon-home",
-    children: [{
-      path: "index",
-      component: Index,
-      name: "首页"
-    }]
   },
   {
     path: "/",
@@ -86,17 +75,6 @@ export default new Router({
       name: "分类管理"
     }
     ]
-  },
-  {
-    path: "/",
-    component: Home,
-    name: "用户管理",
-    iconCls: "iconfont icon-icon_user_management",
-    children: [{
-      path: "/userList",
-      component: UserList,
-      name: "用户列表"
-    }]
   },
   {
     path: "/",
