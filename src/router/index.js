@@ -7,18 +7,10 @@ const ServerError = () => import("@/views/error/500");
 const Login = () => import("@/views/Login");
 const Register = () => import("@/views/Register");
 const Home = () => import("@/views/home/Home");
-const Index = () => import("@/views/index/Index");
 const OrderList = () => import("@/views/order/OrderList");
-const DeliveryCompany = () => import("@/views/order/DeliveryCompany");
-const RefundOrderRecord = () => import("@/views/order/RefundOrderRecord");
-const UserList = () => import("@/views/user/UserList");
 const BookList = () => import("@/views/book/BookList");
 const BookClassify = () => import("@/views/book/BookClassify");
-const StockPurchase = () => import("@/views/stock/StockPurchase");
-const StockRecord = () => import("@/views/stock/StockRecord");
-const AdminInfo = () => import("@/views/system/AdminInfo");
-const ShopManagement = () => import("@/views/system/ShopManagement");
-const ShopOptionRecord = () => import("@/views/system/ShopOptionRecord");
+const StockList = () => import("@/views/stock/StockList");
 
 Vue.use(Router);
 
@@ -49,14 +41,6 @@ export default new Router({
       path: "/orderList",
       component: OrderList,
       name: "订单列表"
-    }, {
-      path: "/refundOrderRecord",
-      component: RefundOrderRecord,
-      name: "退款订单处理记录"
-    }, {
-      path: "/deliveryCompany",
-      component: DeliveryCompany,
-      name: "物流公司列表"
     }]
   },
   {
@@ -79,35 +63,12 @@ export default new Router({
   {
     path: "/",
     component: Home,
-    name: "进货管理",
+    name: "库存管理",
     iconCls: "iconfont icon-jinhuodan",
     children: [{
-      path: "/stockPurchase",
-      component: StockPurchase,
-      name: "库存管理"
-    }, {
-      path: "/stockRecord",
-      component: StockRecord,
-      name: "进货记录"
-    }]
-  },
-  {
-    path: "/index",
-    component: Home,
-    name: "系统管理",
-    iconCls: "iconfont icon-setting",
-    children: [{
-      path: "/adminInfo",
-      component: AdminInfo,
-      name: "个人信息修改"
-    }, {
-      path: "/shopManagement",
-      component: ShopManagement,
-      name: "店铺管理"
-    }, {
-      path: "/shopOptionRecord",
-      component: ShopOptionRecord,
-      name: "店铺操作日志"
+      path: "/stockList",
+      component: StockList,
+      name: "库存列表"
     }]
   },
   {

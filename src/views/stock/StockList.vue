@@ -1,0 +1,356 @@
+<template>
+  <div>
+    <div class="filter-search">
+      <el-input placeholder="书名" size="medium" v-model.trim="searchParam.name" clearable @keyup.native.enter="search">
+      </el-input>
+      <el-input placeholder="类型" size="medium" v-model.trim="searchParam.type" clearable @keyup.native.enter="search">
+      </el-input>
+      <el-button type="primary" size="medium" icon="el-icon-search" @click.native="search">搜索
+      </el-button>
+      <el-button type="danger" size="medium" @click.native="resetSearch">重置
+      </el-button>
+    </div>
+    <div class="table-container">
+      <el-table size="mini" v-loading="loading" :data="stockList" :header-cell-style="{ background: '#fdfdfd' }"
+        :height="460" @selection-change="handleSelectionChange" border>
+        <el-table-column type="selection" align="center"></el-table-column>
+        <!-- <template v-for="item in tableItem"> -->
+        <el-table-column prop="name" align="center" label="书名"></el-table-column>
+        <el-table-column align="center" label="是否在售">
+          <template slot-scope="scope">
+            <span v-if="scope.row.isSale === true" class="status-success">是</span>
+            <span v-else class="status-failed">否</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="type" align="center" label="类型">
+        </el-table-column>
+        <el-table-column prop="describe" align="center" label="描述信息">
+        </el-table-column>
+        <el-table-column prop="price" align="center" label="价格">
+        </el-table-column>
+        <el-table-column align="center" label="主图">
+          <template slot-scope="scope">
+            <el-button v-if="scope.row.image" type="text" size="mini" @click.native="showImgDialogFun(scope.row.image)">
+              查看图片
+            </el-button>
+            <span v-else>---</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="stockTotal" align="center" label="总库存">
+        </el-table-column>
+        <el-table-column prop="stockSale" align="center" label="销售量">
+        </el-table-column>
+        <el-table-column prop="stockNum" align="center" label="剩余量">
+        </el-table-column>
+
+        <!-- </template> -->
+        <el-table-column fixed="right" align="center" label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="mini" @click.native="addStock(scope.row)">添加库存
+            </el-button>
+            <el-button type="text" size="mini" @click.native="cutStock(scope.row)">减少库存
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        :current-page="searchParam.page" :page-sizes="[15, 30, 50]" :page-size="searchParam.size"
+        layout="total, sizes, prev, pager, next, jumper" :total="total"></el-pagination>
+    </div>
+    <el-dialog top="50px" :visible.sync="showImgDialog">
+      <div class="dialog-img">
+        <img v-for="(item, i) in showImageUrl" :key="i" :src="item" alt="图片详情" style="margin: 10px" />
+      </div>
+    </el-dialog>
+    <el-dialog :visible.sync="addStockShow" width="300px" center>
+      <el-input-number v-model="updateStockNum" :min="0" :max="10" label="描述文字" width="300px"></el-input-number>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addStockShow = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="减少库存" :visible.sync="dialogVisible" width="30%">
+      减少库存数量
+      <el-input placeholder="请输入数量" v-model="updateStockNum" type="number" min="0"></el-input>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cutStockShow = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+  import * as bookApi from "./../../api/bookList";
+  import {
+    timeFormat,
+    getDatePickerTime,
+    handleError,
+    decimalReg,
+  } from "./../../util/util";
+  import {
+    mapState
+  } from "vuex";
+
+  // import showTags from "./../../components/ShowTags";
+  import {
+    HandleDirective
+  } from "vue-slicksort";
+
+  export default {
+    data() {
+      return {
+        userId: "",
+        // 列表数据总数
+        total: 0,
+        // 列表数据
+        stockList: [],
+        // 加载中
+        loading: false,
+        // 展示查看大图
+        showImgDialog: false,
+        // 大图Url
+        showImageUrl: [],
+        // 搜索参数
+        searchParam: {
+          page: 1,
+          size: 15,
+          name: "",
+          type: "",
+        },
+        addStockShow: false,
+        cutStockShow: false,
+        updateStock: {},
+        updateStockNum:0
+      };
+    },
+    computed: {
+      ...mapState["userInfo"],
+      // 分类转换为 map
+      bookTypeMap() {
+        let obj = {};
+        for (let i = 0, len = this.bookType.length; i < len; i++) {
+          obj[this.bookType[i].id] = this.bookType[i].name;
+        }
+        return obj;
+      },
+    },
+    created() {
+      // 默认查一个月的
+      this.dataPicker = getDatePickerTime(90);
+      this.getStockList();
+      this.getBookType();
+    },
+    methods: {
+      // 执行搜索
+      search() {
+        this.searchParam.page = 1;
+        this.getStockList();
+      },
+      // 获取表格数据
+      async getStockList() {
+        try {
+          this.loading = true;
+          const param = {
+            ...this.searchParam,
+            useId: this.userId,
+          };
+          let res = await bookApi.getStockList(param);
+          this.loading = false;
+          if (res.code === 200) {
+            this.stockList = res.result.data;
+            this.total = res.result.total;
+          } else {
+            this.$message({
+              message: res.message,
+              type: "error",
+            });
+          }
+        } catch (error) {
+          this.loading = false;
+          handleError(error);
+        }
+      },
+      // 获取全部分类
+      async getBookType() {
+        try {
+          this.loading = true;
+          const param = {
+            userId: this.userId,
+          };
+          let res = await bookApi.getBookType(param);
+          this.loading = false;
+          if (res.code === 200) {
+            this.bookType = res.result.data;
+          } else {
+            this.$message({
+              message: res.message,
+              type: "error",
+            });
+          }
+        } catch (error) {
+          this.loading = false;
+          handleError(error);
+        }
+      },
+      // 重置搜索条件
+      resetSearch() {
+        this.dataPicker = getDatePickerTime(90);
+        this.searchParam = {
+          page: 1,
+          size: 15,
+          name: "",
+          type: "",
+        };
+        this.getStockList();
+      },
+      // 查看图片
+      showImgDialogFun(imageUrl) {
+        if (Array.isArray(imageUrl)) {
+          this.showImageUrl = imageUrl;
+        } else {
+          this.showImageUrl = [imageUrl];
+        }
+        this.showImgDialog = true;
+      },
+      // 图书选择变化
+      handleSelectionChange(val) {
+        this.multipleSelection = val;
+      },
+      // 每页页数变化
+      handleSizeChange(val) {
+        this.searchParam.size = val;
+        this.getStockList();
+      },
+      // 页码变化
+      handleCurrentChange(val) {
+        this.searchParam.page = val;
+        this.getStockList();
+      },
+      // 关闭弹框
+      closeDialog() {
+        this.$refs["updateBookForm"].clearValidate();
+      },
+      // url加上时间参数
+      getTimeUrl() {
+        return `?t=${new Date().getTime()}`;
+      },
+      // 小数校验
+      decimalRegFun(rule, value, callback) {
+        if (!decimalReg.test(value)) {
+          callback(new Error("请输入正确的数字,最多两位小数"));
+        } else {
+          callback();
+        }
+      },
+      addStock(data) {
+        this.updateStock = data;
+        this.addStockShow = true;
+      },
+      cutStock(data) {
+        this.updateStock = data;
+        this.cutStockShow = true;
+      },
+    },
+    directives: {
+      handle: HandleDirective,
+    },
+  };
+</script>
+
+<style lang="stylus" scoped>
+  @import './../../styl/variables.styl';
+  @import './../../styl/common.styl';
+
+  .filter-search {
+    display: flex;
+    flex-wrap: wrap;
+
+    .el-date-editor {
+      max-width: 360px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    .el-button {
+      height: 36px;
+    }
+
+    .el-input {
+      max-width: 140px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    .edit-btn {
+      position: absolute;
+      right: 4px;
+    }
+  }
+
+  .option-button {
+    position: relative;
+    padding-right: 50px;
+
+    .edit-btn {
+      position: absolute;
+      right: 4px;
+    }
+  }
+
+  .form-upload-excel {
+    display: inline-block;
+    margin-left: 10px;
+  }
+
+  .table-container {
+    margin-top: 20px;
+
+    .el-pagination {
+      margin-top: 20px;
+    }
+  }
+
+  .el-dialog__body {
+    .el-form {
+      height: 400px;
+      padding: 10px;
+      overflow-y: scroll;
+
+      .el-select {
+        width: 100%;
+      }
+    }
+
+    .el-input-number {
+      margin-left: 10px;
+    }
+
+    .preview {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px dashed #999;
+      border-radius: 6px;
+
+      img {
+        cursor: pointer;
+        max-width: 300px;
+      }
+    }
+  }
+
+  .dialog-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 10px;
+
+    img {
+      max-width: 200px;
+    }
+  }
+</style>

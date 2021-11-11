@@ -8,7 +8,7 @@ export const getBookList = params => post("/book/queryList", params);
 // 删除列表中的图书
 export const delBook = params => post("/book/delBook", params);
 // 获取所有图书分类
-export const getBookType = (params) => post("/book/bookType",params);
+export const getBookType = (params) => post("/book/bookType", params);
 // // 删除分类
 // export const deleteClassify = params => post("/book/deleteClassify", params);
 // 更新图书
@@ -17,11 +17,18 @@ export const updateBook = (params) => post("/book/updateBook", params);
 export const onShelf = (params) => post("/book/onShelf", params);
 // 下架
 export const offShelf = (params) => post("/book/offShelf", params);
-
-
-
 // 添加图书
 export const addBook = (params) => post("/book/addBook", params);
+
+// 添加图书
+export const getStockList = (params) => post("/stock/queryList", params);
+// 添加图书
+export const addStock = (params) => post("/stock/addStock", params);
+// 添加图书
+export const cutStock = (params) => post("/stock/cutStock", params);
+
+
+
 // 添加分类
 export const addClassify = params => post("/book/addClassify", params);
 // 批量上传Excel
