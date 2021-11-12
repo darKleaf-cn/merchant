@@ -397,7 +397,7 @@ export default {
     };
   },
   computed: {
-    ...mapState["userInfo"],
+    ...mapState(["userInfo"]),
     // 分类转换为 map
     bookTypeMap() {
       let obj = {};
@@ -408,8 +408,7 @@ export default {
     },
   },
   created() {
-    // 默认查一个月的
-    this.dataPicker = getDatePickerTime(90);
+    this.userId = this.userInfo.userId;
     this.getBookList();
     this.getBookType();
     let tableItemStorage = localStorage.getItem(STORAGE_NAME);

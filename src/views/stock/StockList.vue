@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="stockList">
     <div class="filter-search">
       <el-input placeholder="书名" size="medium" v-model.trim="searchParam.name" clearable @keyup.native.enter="search">
       </el-input>
@@ -12,9 +12,7 @@
     </div>
     <div class="table-container">
       <el-table size="mini" v-loading="loading" :data="stockList" :header-cell-style="{ background: '#fdfdfd' }"
-        :height="460" @selection-change="handleSelectionChange" border>
-        <el-table-column type="selection" align="center"></el-table-column>
-        <!-- <template v-for="item in tableItem"> -->
+        :height="460" border>
         <el-table-column prop="name" align="center" label="书名"></el-table-column>
         <el-table-column align="center" label="是否在售">
           <template slot-scope="scope">
@@ -62,19 +60,18 @@
         <img v-for="(item, i) in showImageUrl" :key="i" :src="item" alt="图片详情" style="margin: 10px" />
       </div>
     </el-dialog>
-    <el-dialog :visible.sync="addStockShow" width="300px" center>
-      <el-input-number v-model="updateStockNum" :min="0" :max="10" label="描述文字" width="300px"></el-input-number>
+    <el-dialog title="添加库存" :visible.sync="addStockShow" width="300px" center>
+      <el-input-number v-model="updateStockNum" :min="0" width="300px"></el-input-number>
       <span slot="footer" class="dialog-footer">
         <el-button @click="addStockShow = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="updateStockFun(true)">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="减少库存" :visible.sync="dialogVisible" width="30%">
-      减少库存数量
-      <el-input placeholder="请输入数量" v-model="updateStockNum" type="number" min="0"></el-input>
+    <el-dialog title="减少库存" :visible.sync="cutStockShow" width="300px" center>
+      <el-input-number v-model="updateStockNum" :min="0" width="300px"></el-input-number>
       <span slot="footer" class="dialog-footer">
         <el-button @click="cutStockShow = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="updateStockFun(false)">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -100,7 +97,6 @@
   export default {
     data() {
       return {
-        userId: "",
         // 列表数据总数
         total: 0,
         // 列表数据
@@ -121,11 +117,12 @@
         addStockShow: false,
         cutStockShow: false,
         updateStock: {},
-        updateStockNum:0
+        updateStockNum: 0,
+        userId:"asa"
       };
     },
     computed: {
-      ...mapState["userInfo"],
+      ...mapState(["userInfo"]),
       // 分类转换为 map
       bookTypeMap() {
         let obj = {};
@@ -135,9 +132,8 @@
         return obj;
       },
     },
-    created() {
-      // 默认查一个月的
-      this.dataPicker = getDatePickerTime(90);
+    mounted() {
+      this.userId = this.userInfo.userId;
       this.getStockList();
       this.getBookType();
     },
@@ -213,10 +209,6 @@
         }
         this.showImgDialog = true;
       },
-      // 图书选择变化
-      handleSelectionChange(val) {
-        this.multipleSelection = val;
-      },
       // 每页页数变化
       handleSizeChange(val) {
         this.searchParam.size = val;
@@ -251,6 +243,51 @@
         this.updateStock = data;
         this.cutStockShow = true;
       },
+      async updateStockFun(key) {
+        if (key) {
+          const param = {
+            userId: this.userId,
+            bookId: this.updateStock.bookId,
+            stockAddNum: this.updateStockNum
+          }
+          const res = await bookApi.addStock(param)
+          if (res.code === 200) {
+            this.$message({
+              message: "添加库存成功",
+              type: "success",
+            });
+          } else {
+            this.$message({
+              message: res.message,
+              type: "error",
+            });
+          }
+          this.addStockShow = false;
+          this.getStockList();
+        } else {
+          const param = {
+            userId: this.userId,
+            bookId: this.updateStock.bookId,
+            stockCutNum: this.updateStockNum
+          }
+          const res = await bookApi.cutStock(param)
+          if (res.code === 200) {
+            this.$message({
+              message: "减少库存成功",
+              type: "success",
+            });
+          } else {
+            this.$message({
+              message: res.message,
+              type: "error",
+            });
+          }
+          this.cutStockShow = false;
+          this.getStockList();
+
+        }
+        this.updateStockNum = 0;
+      }
     },
     directives: {
       handle: HandleDirective,
@@ -258,7 +295,7 @@
   };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="stylus">
   @import './../../styl/variables.styl';
   @import './../../styl/common.styl';
 
@@ -351,6 +388,12 @@
 
     img {
       max-width: 200px;
+    }
+  }
+
+  .el-dialog {
+    div.el-dialog__body {
+      text-align: center;
     }
   }
 </style>

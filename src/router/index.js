@@ -9,7 +9,6 @@ const Register = () => import("@/views/Register");
 const Home = () => import("@/views/home/Home");
 const OrderList = () => import("@/views/order/OrderList");
 const BookList = () => import("@/views/book/BookList");
-const BookClassify = () => import("@/views/book/BookClassify");
 const StockList = () => import("@/views/stock/StockList");
 
 Vue.use(Router);
@@ -35,6 +34,17 @@ export default new Router({
   {
     path: "/",
     component: Home,
+    name: "图书管理",
+    iconCls: "iconfont icon-book",
+    children: [{
+      path: "/bookList",
+      component: BookList,
+      name: "图书列表"
+    }]
+  },
+  {
+    path: "/",
+    component: Home,
     name: "订单管理",
     iconCls: "iconfont icon-emaxcitygerenxinxitubiaoji03",
     children: [{
@@ -42,23 +52,6 @@ export default new Router({
       component: OrderList,
       name: "订单列表"
     }]
-  },
-  {
-    path: "/",
-    component: Home,
-    name: "图书管理",
-    iconCls: "iconfont icon-book",
-    children: [{
-      path: "/bookList",
-      component: BookList,
-      name: "图书列表"
-    },
-    {
-      path: "/bookClassify",
-      component: BookClassify,
-      name: "分类管理"
-    }
-    ]
   },
   {
     path: "/",

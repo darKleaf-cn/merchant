@@ -52,6 +52,7 @@
 import Base64 from "./../util/base64";
 import { login } from "./../api/login";
 import { mobileReg, handleError } from "./../util/util";
+import { mapMutations} from "vuex";
 
 const SAVE_NAME = "saveItem";
 
@@ -90,6 +91,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(["SET_USERINFO"]),
     submitForm(form) {
       this.$refs[form].validate(async (valid) => {
         if (valid) {
@@ -111,6 +113,7 @@ export default {
               password,
             });
             if (res.code === 200) {
+              this.SET_USERINFO(res.result);
               this.$message({
                 message: "登陆成功",
                 type: "success",
