@@ -9,6 +9,7 @@ const Register = () => import("@/views/Register");
 const Home = () => import("@/views/home/Home");
 const OrderList = () => import("@/views/order/OrderList");
 const BookList = () => import("@/views/book/BookList");
+const AddBook = () => import("@/views/book/AddBook");
 const StockList = () => import("@/views/stock/StockList");
 
 Vue.use(Router);
@@ -40,6 +41,10 @@ export default new Router({
       path: "/bookList",
       component: BookList,
       name: "图书列表"
+    },{
+      path: "/addBook",
+      component: AddBook,
+      name: "添加图书"
     }]
   },
   {

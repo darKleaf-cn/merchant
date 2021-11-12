@@ -80,19 +80,11 @@
 <script>
   import * as bookApi from "./../../api/bookList";
   import {
-    timeFormat,
-    getDatePickerTime,
     handleError,
-    decimalReg,
   } from "./../../util/util";
   import {
     mapState
   } from "vuex";
-
-  // import showTags from "./../../components/ShowTags";
-  import {
-    HandleDirective
-  } from "vue-slicksort";
 
   export default {
     data() {
@@ -191,7 +183,6 @@
       },
       // 重置搜索条件
       resetSearch() {
-        this.dataPicker = getDatePickerTime(90);
         this.searchParam = {
           page: 1,
           size: 15,
@@ -218,22 +209,6 @@
       handleCurrentChange(val) {
         this.searchParam.page = val;
         this.getStockList();
-      },
-      // 关闭弹框
-      closeDialog() {
-        this.$refs["updateBookForm"].clearValidate();
-      },
-      // url加上时间参数
-      getTimeUrl() {
-        return `?t=${new Date().getTime()}`;
-      },
-      // 小数校验
-      decimalRegFun(rule, value, callback) {
-        if (!decimalReg.test(value)) {
-          callback(new Error("请输入正确的数字,最多两位小数"));
-        } else {
-          callback();
-        }
       },
       addStock(data) {
         this.updateStock = data;
@@ -288,9 +263,6 @@
         }
         this.updateStockNum = 0;
       }
-    },
-    directives: {
-      handle: HandleDirective,
     },
   };
 </script>

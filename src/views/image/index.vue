@@ -50,30 +50,36 @@ export default {
       this.fileList = a;
     },
     a() {
-      console.log(this.fileList);
+      // this.$emit('updateImage',this.fileFilter(this.fileList))
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-    handleRemove(file, fileList) {
-      console.log(this.fileList);
-      console.log(file, fileList);
-      this.fileList = fileList;
+    handleRemove(file,fileList) {
+      for(let i=0;i<this.fileList.length;i++) {
+        if(file.uid == this.fileList[i].uid){
+          this.fileList.splice(i,1)
+        }
+      }
       if (this.fileList.length >= this.limit) {
         this.hideUploadEdit = true;
       } else {
         this.hideUploadEdit = false;
       }
+      this.$emit('updateImage',this.fileFilter(this.fileList))
     },
     beforeAvatarUpload(file) {
       var reader = new FileReader();
       reader.readAsDataURL(file);
+      const that = this;
       reader.onload = function () {
-        console.log(reader.result); //获取到base64格式图片
+        that.fileList.push({
+          uid:file.uid,
+          url:reader.result
+        })
+        that.$emit('updateImage',that.fileFilter(that.fileList))
       };
-      console.log(this.fileList);
-      console.log(file);
     },
     handleEditChange(file, fileList) {
       if (fileList.length >= this.limit) {
@@ -82,6 +88,19 @@ export default {
         this.hideUploadEdit = false;
       }
     },
+    fileFilter(data){
+      const result=[];
+      if(data.length === 1){
+        return data[0].url;
+      }else if(data.length === 0){
+        return "";
+      }else{
+        for(let item of data){
+          result.push(item.url)
+        }
+        return result;
+      }
+    }
   },
   created() {
     this.init();
