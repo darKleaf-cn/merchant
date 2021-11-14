@@ -218,12 +218,12 @@
           this.loading = true;
           const param = {
             ...this.searchParam,
-            useId: this.userId,
+            userId: this.userId,
           };
           let res = await bookApi.getBookList(param);
           this.loading = false;
-          if (res.code === 200) {
-            this.bookList = res.result.data;
+          if (res.rtnCode === "200") {
+            this.bookList = res.result.bookList;
             this.total = res.result.total;
           } else {
             this.$message({
@@ -245,7 +245,7 @@
           };
           let res = await bookApi.getBookType(param);
           this.loading = false;
-          if (res.code === 200) {
+          if (res.rtnCode === "200") {
             this.bookType = res.result.data;
           } else {
             this.$message({
@@ -287,7 +287,7 @@
             ...this.updateBook
           }
           let res = await bookApi.updateBook(param);
-          if (res.code === 200) {
+          if (res.rtnCode === "200") {
             this.$message({
               message: "修改成功",
               type: "success",
@@ -320,7 +320,7 @@
         try {
           if (isSale) {
             let res = await bookApi.onShelf(params);
-            if (res.code === 200) {
+            if (res.rtnCode === "200") {
               this.$message({
                 message: "上架成功",
                 type: "success",
@@ -334,7 +334,7 @@
             }
           } else {
             let res = await bookApi.offShelf(params);
-            if (res.code === 200) {
+            if (res.rtnCode === "200") {
               this.$message({
                 message: "下架成功",
                 type: "success",
@@ -366,7 +366,7 @@
         }
         try {
           let res = await bookApi.delBook(params);
-          if (res.code === 200) {
+          if (res.rtnCode === "200") {
             this.$message({
               message: "删除成功",
               type: "success",
@@ -417,7 +417,11 @@
         this.updateBook.image = image;
       },
       updateImage2(image) {
-        this.updateBook.imageSmall = image;
+        if(Array.isArray(image)) {
+          this.updateBook.imageSmall = image;
+        }else{
+          this.updateBook.imageSmall = [image];
+        }
       },
       updateImage3(image) {
         this.updateBook.detail = image;

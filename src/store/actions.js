@@ -7,7 +7,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       const token = state.userInfo.token || JSON.parse(getStore('userInfo')).token;
       userInfo({token}).then(res => {
-        if (res.code === 200) {
+        if (res.rtnCode === "200") {
           commit(types.SET_USERINFO, res.result);
           resolve(res);
         } else {

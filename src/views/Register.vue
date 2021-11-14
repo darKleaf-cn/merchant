@@ -98,7 +98,7 @@ export default {
               password,
               phone,
             });
-            if (res.code === 200) {
+            if (res.rtnCode === '200') {
               this.$message({
                 type: "success",
                 message: "注册成功",

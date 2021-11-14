@@ -1,6 +1,7 @@
 const state = {
   userInfo: {
     uesrId:"",
+    shopId:"",
     username: "",
     token: "",
     userImage: ""

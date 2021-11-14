@@ -16,7 +16,7 @@ router.beforeEach(function (to, from, next) {
     token: getStore('userInfo') ? JSON.parse(getStore('userInfo')).token : null
   }
   userInfo(params).then(res => {
-    if (res.code !== 200) { // 没登录
+    if (res.rtnCode !== "200") { // 没登录
       if(to.path === '/login' || to.path === '/register'){
         next()
       }else{

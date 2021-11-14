@@ -91,8 +91,10 @@
         this.$confirm("确认退出吗?", "提示", {})
           .then(async () => {
             try {
-              let res = await logout();
-              if (res.code === 200) {
+              let res = await logout({
+                token:this.userInfo.token
+              });
+              if (res.rtnCode === "200") {
                 this.$router.push("/login");
               } else {
                 this.$message({

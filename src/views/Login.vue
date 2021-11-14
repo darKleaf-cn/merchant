@@ -17,14 +17,14 @@
           :hide-required-asterisk="true"
           label-width="80px"
         >
-          <el-form-item label="登陆账号" prop="username">
+          <el-form-item label="用户名" prop="username">
             <el-input
               v-model.trim="formData.username"
               maxlength="11"
-              placeholder="请输入登陆手机号"
+              placeholder="请输入用户名"
             ></el-input>
           </el-form-item>
-          <el-form-item label="登陆密码" prop="password">
+          <el-form-item label="密码" prop="password">
             <el-input
               v-model.trim="formData.password"
               maxlength="16"
@@ -68,7 +68,8 @@ export default {
       formRules: {
         username: [
           {
-            validator: this.mobileRegFun,
+            required: true,
+            message: "请输入用户名",
             trigger: "blur",
           },
         ],
@@ -112,7 +113,7 @@ export default {
               username,
               password,
             });
-            if (res.code === 200) {
+            if (res.rtnCode === "200") {
               this.SET_USERINFO(res.result);
               this.$message({
                 message: "登陆成功",

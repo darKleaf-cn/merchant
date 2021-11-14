@@ -8,7 +8,7 @@ export const login = params => post("/user/login", params);
 // 注册
 export const register = params => post("/user/register", params);
 // 注销
-export const logout = () => get("/user/logout");
+export const logout = params => post("/user/logout",params);
 // 更改管理员昵称
 export const updateNickname = params => post("/admin/updateNickname", params);
 // 更改密码

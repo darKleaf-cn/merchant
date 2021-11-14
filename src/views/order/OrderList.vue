@@ -15,8 +15,8 @@
         <el-table-column prop="orderId" align="center" label="订单号"></el-table-column>
         <el-table-column align="center" label="订单状态">
           <template slot-scope="scope">
-            <span v-if="scope.row.orderState === 0">未付款</span>
-            <span v-else-if="scope.row.orderState === 1">运输中</span>
+            <span v-if="scope.row.orderState === '0'">未付款</span>
+            <span v-else-if="scope.row.orderState === '1'">运输中</span>
             <span v-else>已完成</span>
           </template>
         </el-table-column>
@@ -120,6 +120,7 @@
         updateStock: {},
         updateStockNum: 0,
         userId: "",
+        shopId:"",
         updateOrderShow: false,
         updateReceiver: {},
         receiverShow: false,
@@ -141,6 +142,7 @@
     },
     mounted() {
       this.userId = this.userInfo.userId;
+      this.shopId = this.userInfo.shopId;
       this.getOrderList();
     },
     methods: {
@@ -155,11 +157,12 @@
           this.loading = true;
           const param = {
             ...this.searchParam,
-            useId: this.userId,
+            userId: this.userId,
+            shopId:this.shopId
           };
           let res = await orderApi.getOrderList(param);
           this.loading = false;
-          if (res.code === 200) {
+          if (res.rtnCode === "200") {
             this.orderList = res.result.data;
             this.total = res.result.total;
           } else {
@@ -202,7 +205,7 @@
         this.getOrderList();
       },
       async delOrder(data) {
-        if (data.orderState !== 2) {
+        if (data.orderState !== '2') {
           this.$message.error({
             message: "订单未完成，无法删除"
           })
@@ -213,7 +216,7 @@
           orderId: data.orderId
         }
         const res = await orderApi.delOrder(param);
-        if (res.code === 200) {
+        if (res.rtnCode === "200") {
           this.$message({
             type: 'success',
             message: "删除成功"
@@ -239,11 +242,12 @@
           receiverAddress: this.updateReceiver.receiverAddress,
         }
         const res = await orderApi.updateOrder(param);
-        if (res.code === 200) {
+        if (res.rtnCode === "200") {
           this.$message({
             type: 'success',
             message: "修改成功"
           })
+          this.updateOrderShow = false;
         } else {
           this.$message.error({
             message: res.message

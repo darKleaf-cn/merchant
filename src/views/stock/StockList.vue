@@ -3,8 +3,6 @@
     <div class="filter-search">
       <el-input placeholder="书名" size="medium" v-model.trim="searchParam.name" clearable @keyup.native.enter="search">
       </el-input>
-      <el-input placeholder="类型" size="medium" v-model.trim="searchParam.type" clearable @keyup.native.enter="search">
-      </el-input>
       <el-button type="primary" size="medium" icon="el-icon-search" @click.native="search">搜索
       </el-button>
       <el-button type="danger" size="medium" @click.native="resetSearch">重置
@@ -104,13 +102,12 @@
           page: 1,
           size: 15,
           name: "",
-          type: "",
         },
         addStockShow: false,
         cutStockShow: false,
         updateStock: {},
         updateStockNum: 0,
-        userId:"asa"
+        userId:""
       };
     },
     computed: {
@@ -141,11 +138,11 @@
           this.loading = true;
           const param = {
             ...this.searchParam,
-            useId: this.userId,
+            userId: this.userId,
           };
           let res = await bookApi.getStockList(param);
           this.loading = false;
-          if (res.code === 200) {
+          if (res.rtnCode === "200") {
             this.stockList = res.result.data;
             this.total = res.result.total;
           } else {
@@ -168,7 +165,7 @@
           };
           let res = await bookApi.getBookType(param);
           this.loading = false;
-          if (res.code === 200) {
+          if (res.rtnCode === "200") {
             this.bookType = res.result.data;
           } else {
             this.$message({
@@ -187,7 +184,6 @@
           page: 1,
           size: 15,
           name: "",
-          type: "",
         };
         this.getStockList();
       },
@@ -226,7 +222,7 @@
             stockAddNum: this.updateStockNum
           }
           const res = await bookApi.addStock(param)
-          if (res.code === 200) {
+          if (res.rtnCode === "200") {
             this.$message({
               message: "添加库存成功",
               type: "success",
@@ -246,7 +242,7 @@
             stockCutNum: this.updateStockNum
           }
           const res = await bookApi.cutStock(param)
-          if (res.code === 200) {
+          if (res.rtnCode === "200") {
             this.$message({
               message: "减少库存成功",
               type: "success",

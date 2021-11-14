@@ -39,6 +39,7 @@
 		data() {
 			return {
 				userId: "",
+				shopId:"",
 				bookForm: {
 					name: "",
 					image: [],
@@ -49,7 +50,6 @@
 					detail: []
 				},
 				bookType: [
-
 				],
 				bookFormValidate: {
 					name: [{
@@ -75,6 +75,7 @@
 		},
 		created() {
 			this.userId = this.userInfo.userId;
+			this.shopId = this.userInfo.shopId;
 			this.getBookType();
 		},
 		methods: {
@@ -85,7 +86,7 @@
 						userId: this.userId,
 					};
 					let res = await bookApi.getBookType(param);
-					if (res.code === 200) {
+					if (res.rtnCode === "200") {
 						this.bookType = res.result.data;
 					} else {
 						this.$message({
@@ -133,10 +134,11 @@
 					}
 					const param = {
 						userId: this.userId,
+						shopId:this.shopId,
 						...this.bookForm
 					}
 					let res = await bookApi.addBook(param);
-					if (res.code === 200) {
+					if (res.rtnCode === "200") {
 						this.$message({
 							message: "添加成功",
 							type: "success",
