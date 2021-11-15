@@ -4,8 +4,8 @@
 			<el-input v-model.trim="bookForm.name" autocomplete="off"></el-input>
 		</el-form-item>
 		<el-form-item label="类型" label-width="80px">
-			<el-select v-model="bookForm.type" placeholder="请选择">
-				<el-option v-for="item in bookType" :key="item" :label="item" :value="item"></el-option>
+			<el-select v-model="bookForm.catgId" placeholder="请选择">
+				<el-option v-for="item in bookType" :key="item.catgId" :label="item.name" :value="item.catgId"></el-option>
 			</el-select>
 		</el-form-item>
 		<el-form-item label="描述信息" prop="describe" label-width="80px">
@@ -45,7 +45,7 @@
 					image: [],
 					price: 0,
 					describe: "",
-					type: null,
+					catgId: null,
 					imageSmall: [],
 					detail: []
 				},
@@ -113,7 +113,7 @@
 						})
 						return;
 					}
-					if (!this.bookForm.type) {
+					if (!this.bookForm.catgId) {
 						this.$message.error({
 							message: "类型不能为空"
 						})
@@ -143,7 +143,7 @@
 							message: "添加成功",
 							type: "success",
 						});
-						this.$router.go(0)
+						// this.$router.go(0)
 					} else {
 						this.$message({
 							message: res.message,

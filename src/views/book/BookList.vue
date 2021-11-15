@@ -79,8 +79,8 @@
           <el-input v-model.trim="updateBook.name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="类型" label-width="80px">
-          <el-select v-model="updateBook.type" placeholder="请选择">
-            <el-option v-for="item in bookType" :key="item" :label="item" :value="item"></el-option>
+          <el-select v-model="updateBook.catgId" placeholder="请选择">
+            <el-option v-for="item in bookType" :key="item.catgId" :label="item.name" :value="item.catgId"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="描述信息" prop="describe" label-width="80px">
