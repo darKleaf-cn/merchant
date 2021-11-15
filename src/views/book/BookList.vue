@@ -3,8 +3,6 @@
     <div class="filter-search">
       <el-input placeholder="书名" size="medium" v-model.trim="searchParam.name" clearable @keyup.native.enter="search">
       </el-input>
-      <el-input placeholder="类型" size="medium" v-model.trim="searchParam.type" clearable @keyup.native.enter="search">
-      </el-input>
     </div>
     <div class="option-button">
       <el-button type="primary" size="medium" icon="el-icon-search" @click.native="search">搜索
@@ -185,8 +183,7 @@
         searchParam: {
           page: 1,
           size: 15,
-          name: "",
-          type: "",
+          name: ""
         }
       };
     },
@@ -264,7 +261,6 @@
           page: 1,
           size: 15,
           name: "",
-          type: "",
         };
         this.getBookList();
       },
